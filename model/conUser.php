@@ -8,13 +8,15 @@ class conUser {
     private $type;
     private $blocked;
 
-    function conUser($row) {
-        if (sizeof($row) == 5) {
-            $this->id = $row['ID'];
-            $this->login = $row['LOGIN'];
-            $this->password = $row['PASSWORD'];
-            $this->type = $row['TYPE'];
-            $this->blocked = $row['BLOCKED'];
+    function conUser($row = null) {
+        if ($row != null) {
+            if (sizeof($row) == 5) {
+                $this->id = $row['ID'];
+                $this->login = $row['LOGIN'];
+                $this->password = $row['PASSWORD'];
+                $this->type = $row['TYPE'];
+                $this->blocked = $row['BLOCKED'];
+            }
         }
     }
 

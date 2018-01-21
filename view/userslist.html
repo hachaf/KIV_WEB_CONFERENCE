@@ -1,0 +1,43 @@
+<section class="resume-section p-3 p-lg-5 d-flex flex-column" id="users">
+    <div class="my-auto">
+        <h2 class="mb-5">Users</h2>
+        <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Type</th>
+                        <th>Blocked</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{user.login}}</td>
+                        <td>{{user.password}}</td>
+
+                        {% if user.type == 'ADM' %}
+                        <td>Administrator</td>
+                        {% elseif user.type == 'AUT' %}
+                        <td>Author</td>
+                        {% elseif user.type == 'REV' %}
+                        <td>Reviewer</td>
+                        {% endif %}
+
+                        {% if user.blocked %}
+                        <td>Yes</td>
+                        {% else %}
+                        <td>No</td>
+                        {% endif %}
+
+                        <td><a href="test.php?p=edituser&id={{user.id}}">Edit</a></td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

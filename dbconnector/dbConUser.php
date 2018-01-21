@@ -23,13 +23,16 @@ class dbConUser extends dbBase {
         $query = "select * from conuser;";
         $statement = $this->connection->prepare($query);
         $statement->execute();
-
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return $rows;
+
+        $users = array();
+        foreach ($rows as $row) {
+            array_push($users, new conUser($row));
+        }
+        return $users;
     }
 
     function getById($id) {
-        if (!is_int($id)) return null;
         $query = "select * from conuser where id = $id;";
         $statement = $this->connection->prepare($query);
         $statement->execute();
@@ -139,6 +142,25 @@ class dbConUser extends dbBase {
         $stmt = $this->connection->prepare($stmt_text);
         $stmt->bindValue(1, $id);
         $stmt->execute();
+    }
+
+    function getByNameAndPwd($username, $pwd) {
+        $stmt = $this->connection->prepare("select * from conuser where (login=:login and password=:password)");
+        $stmt->bindParam(':login', $username);
+        $stmt->bindParam(':password', $pwd);
+        $stmt->execute();
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($res == null) return null;
+        return new conUser($res);
+    }
+
+    function userExist($username) {
+        $stmt = $this->connection->prepare("select count(1) from conuser where (login=:login)");
+        $stmt->bindParam(':login', $username);
+        $stmt->execute();
+        $res = $stmt->fetch(PDO::FETCH_COLUMN, 0);
+        if ($res > 0) return true;
+        return false;
     }
 
 }
