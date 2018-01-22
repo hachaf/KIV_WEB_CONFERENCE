@@ -107,13 +107,18 @@ if (array_key_exists("p",  $_GET)) {
             echo $postCtrl->published();
             break;
 
+        case "viewpost":
+            $postCtrl = new postController();
+            echo $postCtrl->view($_GET["id"]);
+            break;
+
         case "editpost":
             if (array_key_exists("title", $_POST) && array_key_exists("abstract", $_POST)) {
                 $dbPostConnect = new dbPost();
                 $dbPostConnect->Connect();
                 $post = $dbPostConnect->getById($_GET["id"]);
                 $post->setTitle($_POST["title"]);
-                $post->setAbctract($_POST["abstract"]);
+                $post->setAbstract($_POST["abstract"]);
 
                 if (array_key_exists("pdffile", $_FILES)) {
                     if(isset($_FILES['pdffile'])){
@@ -136,8 +141,8 @@ if (array_key_exists("p",  $_GET)) {
                         }
 
                         if(empty($errors)==true){
-                            move_uploaded_file($file_tmp,"posts/" . $post->getID());
-                            $post->setFilename($post->getID().".pdf");
+                            move_uploaded_file($file_tmp,"posts/" . $post->getID() . ".pdf");
+                            $post->setFilename($post->getID() . ".pdf");
                             echo "Success";
                         }else{
                             print_r($errors);

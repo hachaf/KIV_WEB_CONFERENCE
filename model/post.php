@@ -31,7 +31,7 @@ class post {
     }
 
     function getAuthorID() {
-        return $this->id;
+        return $this->authorID;
     }
 
     function setAuthorID($_authorID) {
@@ -50,7 +50,7 @@ class post {
         return $this->abstract;
     }
 
-    function setAbctract($_abstract) {
+    function setAbstract($_abstract) {
         $this->abstract = $_abstract;
     }
 
