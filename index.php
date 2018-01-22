@@ -112,6 +112,57 @@ if (array_key_exists("p",  $_GET)) {
             echo $postCtrl->view($_GET["id"]);
             break;
 
+        case "createpost":
+            if (array_key_exists("title", $_POST) && array_key_exists("abstract", $_POST) && array_key_exists("pdffile", $_FILES)) {
+                $post = new post();
+                $post->setTitle($_POST["title"]);
+                $post->setAbstract($_POST["abstract"]);
+                $post->setState(0);
+                $post->setAuthorID($_SESSION["user"]->getID());
+
+                $dbPostConnect = new dbPost();
+                $dbPostConnect->Connect();
+                $post = $dbPostConnect->create($post);
+
+                if (array_key_exists("pdffile", $_FILES)) {
+                    if(isset($_FILES['pdffile'])){
+                        $errors= array();
+                        $file_name = $_FILES['pdffile']['name'];
+                        $file_size = $_FILES['pdffile']['size'];
+                        $file_tmp  = $_FILES['pdffile']['tmp_name'];
+                        $file_type = $_FILES['pdffile']['type'];
+                        $expl = explode('.',$_FILES['pdffile']['name']);
+                        $end = end($expl);
+                        $file_ext = strtolower($end);
+                        $expension = 'pdf';
+
+                        if($file_ext != $expension){
+                            $errors[] = "extension not allowed, please choose a PDF file.";
+                        }
+
+                        if($file_size > 20971520){
+                            $errors[] = 'File size must be excately 20 MB';
+                        }
+
+                        if(empty($errors)==true){
+                            move_uploaded_file($file_tmp,"posts/" . $post->getID() . ".pdf");
+                            $post->setFilename($post->getID() . ".pdf");
+                            echo "Success";
+                        }else{
+                            print_r($errors);
+                        }
+                    }
+                }
+
+                $dbPostConnect->update($post);
+                $dbPostConnect->Disconnect();
+            }
+
+
+            $postCtrl = new postController();
+            echo $postCtrl->create();
+            break;
+
         case "editpost":
             if (array_key_exists("title", $_POST) && array_key_exists("abstract", $_POST)) {
                 $dbPostConnect = new dbPost();

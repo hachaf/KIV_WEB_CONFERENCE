@@ -42,40 +42,25 @@ class dbPost extends dbBase {
 
     function create($post) {
         if ($post == null) return null;
+        $authorId = $post->getAuthorID();
+        $abstract = $post->getAbstract();
+        $filename = $post->getFilename() != null ? $post->getAuthorID() : 'NULL';
+        $publicated = (new \DateTime())->format('Y-m-d H:i:s');
+        $state = $post->getState();
+        $title = $post->getTitle();
 
-        $pars = array();
-        $pars["AUTHOR_ID"] = $post->getAuthorID();
-        $pars["ABSTRACT"] = $post->getAbstract();
-        $pars["FILENAME"] = $post->getFilename();
-        $pars["PUBLICATED"] = $post->getPublicated();
-        $pars["STATE"] = $post->getState();
-        $pars["TITLE"] = $post->getTitle();
+        $query = "INSERT INTO POST (AUTHOR_ID, ABSTRACT, FILENAME, PUBLICATED, STATE, TITLE) 
+                  VALUES (:authorId, :abstract, :filename, :publicated, :state, :title);";
+        $statement = $this->connection->prepare($query);
 
-        $insert_columns = "";
-        $insert_values  = "";
+        $statement->bindParam(":authorId", $authorId);
+        $statement->bindParam(":abstract", $abstract);
+        $statement->bindParam(":publicated", $publicated);
+        $statement->bindParam(":filename", $filename);
+        $statement->bindParam(":state", $state);
+        $statement->bindParam(":title", $title);
 
-        if ($pars != null)
-            foreach ($pars as $column => $value)
-            {
-                // pridat carky
-                if ($insert_columns != "") $insert_columns .= ", ";
-                if ($insert_columns != "") $insert_values .= ", ";
-
-                $insert_columns .= "`$column`";
-                $insert_values .= "?";
-            }
-
-        $stmt_text = "insert into `post` ($insert_columns) values ($insert_values);";
-        $stmt = $this->connection->prepare($stmt_text);
-        $bind_param_number = 1;
-
-        foreach ($pars as $column => $value) {
-            $stmt->bindValue($bind_param_number, $value);  // vzdy musim dat value, abych si nesparoval promennou (to nechci)
-            $bind_param_number ++;
-        }
-
-        $stmt->execute();
-
+        $statement->execute();
         $item_id = $this->connection->lastInsertId();
         $post->setID($item_id);
         return $post;

@@ -10,15 +10,17 @@ class post {
     private $state;
     private $title;
 
-    function post($row) {
-        if (sizeof($row) == 7) {
-            $this->id = $row['ID'];
-            $this->authorID = $row['AUTHOR_ID'];
-            $this->abstract = $row['ABSTRACT'];
-            $this->fileName = $row['FILENAME'];
-            $this->publicated = $row['PUBLICATED'];
-            $this->state = $row['STATE'];
-            $this->title = $row['TITLE'];
+    function post($row = null) {
+        if ($row != null) {
+            if (sizeof($row) == 7) {
+                $this->id = $row['ID'];
+                $this->authorID = $row['AUTHOR_ID'];
+                $this->abstract = $row['ABSTRACT'];
+                $this->fileName = $row['FILENAME'];
+                $this->publicated = $row['PUBLICATED'];
+                $this->state = $row['STATE'];
+                $this->title = $row['TITLE'];
+            }
         }
     }
 
