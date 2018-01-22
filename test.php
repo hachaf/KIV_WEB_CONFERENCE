@@ -57,6 +57,46 @@ if (array_key_exists("p",  $_GET)) {
 
     switch ($_GET["p"]) {
 
+        case "login":
+            if (array_key_exists("username", $_POST)) {
+                $connector_dbUser = new dbConUser();
+                $connector_dbUser->connect();
+                $user = $connector_dbUser->getByNameAndPwd($_POST["username"], $_REQUEST["pwd"]);
+                $connector_dbUser->Disconnect();
+                if ($user != null) {
+                    $_SESSION["user"] = $user;
+                    echo $homeCtrl->indexAction($_SESSION["user"]);
+                }
+            }
+            echo $homeCtrl->login();
+            break;
+
+        case "logout":
+            session_abort();
+            echo $homeCtrl->indexAction(null);
+            break;
+
+        case "register":
+            if (array_key_exists("reg-username", $_POST) && array_key_exists("reg-pwd", $_POST)) { //pokus o registraci
+                $connector_dbUser = new dbConUser();
+                $connector_dbUser->Connect();
+                if (!$connector_dbUser->userExist($_POST["reg-username"])) { //uzivatel neni v databazi a lze je zalozit
+                    $user = new conUser();
+                    $user->setLogin($_POST["reg-username"]);
+                    $user->setBlocked(0);
+                    $user->setPassword($_POST["reg-pwd"]);
+                    $user->setType("AUT");
+                    $connector_dbUser->create($user);
+                    echo $homeCtrl->register($user);
+                } else { //uzivatel jiz existuje
+                    $regMsg = 'User with this name already exists.';
+                    echo $homeCtrl->register(null, $regMsg);
+                }
+            } else {
+                echo $homeCtrl->register(null);
+            }
+            break;
+
         case "edituser":
             if (array_key_exists("login", $_POST)) {
                 $userCtrl = new userController();
@@ -76,7 +116,8 @@ if (array_key_exists("p",  $_GET)) {
             break;
 
         case "userslist":
-            //TODO
+            $userCtrl = new userController();
+            echo $userCtrl->usersList();
             break;
 
         default:

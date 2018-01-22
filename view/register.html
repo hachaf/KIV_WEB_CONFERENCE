@@ -42,17 +42,27 @@
 
 <div class="container-fluid p-0">
 
-    <section class="resume-section p-3 p-lg-5 d-flex d-column" id="about">
+    <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="register">
         <div class="my-auto">
-            <h1 class="mb-0">Crypto-currency
-                <span class="text-primary">conference</span>
-            </h1>
-            <div class="subheading mb-5">Fakulta aplikovaných věd
-                Západočeská univerzita v Plzni
-                Univerzitní 8, 301 00 Plzeň
-                <a href="mailto:name@email.com">hachaf@students.zcu.cz</a>
+            <h2 class="mb-5">Register</h2>
+            <div class="resume-item d-flex flex-column flex-md-row mb-5">
+                {% if regMsg != null %}
+                <p>{{regMsg}}</p>
+                {% endif %}
             </div>
-            <p class="mb-5">Moderated conference on the current topic of virtual (crypto) currencies</p>
+            <div class="resume-item d-flex flex-column flex-md-row mb-5">
+                <form action="test.php" method="post">
+                    <div class="form-group">
+                        <label for="reg-username">Username:</label>
+                        <input type="text" class="form-control" id="reg-username" name="reg-username">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-pwd">Password:</label>
+                        <input type="password" class="form-control" id="reg-pwd" name="reg-pwd">
+                    </div>
+                    <button type="submit" class="btn btn-default">Register</button>
+                </form>
+            </div>
         </div>
     </section>
 
