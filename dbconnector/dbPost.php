@@ -27,7 +27,6 @@ class dbPost extends dbBase {
     }
 
     function getById($id) {
-        if (!is_int($id)) return null;
         $query = "select * from post where id = $id;";
         $statement = $this->connection->prepare($query);
         $statement->execute();
@@ -50,6 +49,7 @@ class dbPost extends dbBase {
         $pars["FILENAME"] = $post->getFilename();
         $pars["PUBLICATED"] = $post->getPublicated();
         $pars["STATE"] = $post->getState();
+        $pars["TITLE"] = $post->getTitle();
 
         $insert_columns = "";
         $insert_values  = "";
@@ -89,6 +89,7 @@ class dbPost extends dbBase {
         $pars["ABSTRACT"] = "'" . $post->getAbstract() . "'";
         $pars["FILENAME"] = "'" . $post->getFilename() . "'";
         $pars["PUBLICATED"] = "STR_TO_DATE('" . $post->getPublicated() . "', '%Y-%m-%d')";
+        $pars["TITLE"] = "'" . $post->getTitle() . "'";
         if ($post->getState()) {
             $pars["STATE"] = "1";
         } else {
@@ -112,6 +113,7 @@ class dbPost extends dbBase {
             . ', ABSTRACT = ' . $pars["ABSTRACT"]
             . ', FILENAME = ' . $pars["FILENAME"]
             . ', PUBLICATED = ' . $pars["PUBLICATED"]
+            . ', TITLE = ' . $pars["TITLE"]
             . ', STATE = ' . $pars["STATE"]
             .' WHERE ID = ' .  $pars["ID"] . ';';
 
@@ -134,6 +136,19 @@ class dbPost extends dbBase {
         $stmt->bindValue(1, $id);
         echo $stmt_text;
         $stmt->execute();
+    }
+
+    function getByAuthor($authorId) {
+        $query = "select * from post where author_id = :authorId;";
+        $statement = $this->connection->prepare($query);
+        $statement->bindParam(":authorId", $authorId);
+        $statement->execute();
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $posts = array();
+        foreach ($rows as $row) {
+            array_push($posts, new post($row));
+        }
+        return $posts;
     }
 
 }

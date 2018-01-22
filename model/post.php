@@ -8,15 +8,17 @@ class post {
     private $fileName;
     private $publicated;
     private $state;
+    private $title;
 
     function post($row) {
-        if (sizeof($row) == 6) {
+        if (sizeof($row) == 7) {
             $this->id = $row['ID'];
             $this->authorID = $row['AUTHOR_ID'];
             $this->abstract = $row['ABSTRACT'];
             $this->fileName = $row['FILENAME'];
             $this->publicated = $row['PUBLICATED'];
             $this->state = $row['STATE'];
+            $this->title = $row['TITLE'];
         }
     }
 
@@ -66,6 +68,16 @@ class post {
 
     function setState($_state) {
         $this->state = $_state;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
     }
 
 

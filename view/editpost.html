@@ -42,20 +42,29 @@
 
 <div class="container-fluid p-0">
 
-    <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="login">
+    <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="editpost">
         <div class="my-auto">
-            <h2 class="mb-5">Login</h2>
+            <h2 class="mb-5">Edit post</h2>
             <div class="resume-item d-flex flex-column flex-md-row mb-5">
-                <form action="index.php?p=login" method="post">
+                {% if msg != null %}
+                <p>{{msg}}</p>
+                {% endif %}
+            </div>
+            <div class="resume-item d-flex flex-column flex-md-row mb-5">
+                <form action="index.php?p=editpost&id={{post.id}}" method="post" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" class="form-control" id="username" name="username">
+                        <label for="title">Title:</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{post.title}}">
                     </div>
                     <div class="form-group">
-                        <label for="pwd">Password:</label>
-                        <input type="password" class="form-control" id="pwd" name="pwd">
+                        <label for="abstract">Abstract:</label>
+                        <textarea class="form-control" id="abstract" name="abstract" cols="50" rows="12">{{post.abstract}}</textarea>
                     </div>
-                    <button type="submit" class="btn btn-default">Sign in</button>
+                    <div class="form-group">
+                        <label for="pdffile">Upload post:</label>
+                        <input type="file" name="pdffile" id="pdffile" accept=".pdf">
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-default">Save changes</button>
                 </form>
             </div>
         </div>

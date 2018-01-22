@@ -42,21 +42,32 @@
 
 <div class="container-fluid p-0">
 
-    <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="login">
+    <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="myposts">
         <div class="my-auto">
-            <h2 class="mb-5">Login</h2>
+            <h2 class="mb-5">My posts</h2>
             <div class="resume-item d-flex flex-column flex-md-row mb-5">
-                <form action="index.php?p=login" method="post">
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" class="form-control" id="username" name="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="pwd">Password:</label>
-                        <input type="password" class="form-control" id="pwd" name="pwd">
-                    </div>
-                    <button type="submit" class="btn btn-default">Sign in</button>
-                </form>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Published</th>
+                        <th>State</th>
+                        <th>View</th>
+                        <th>Edit</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <td>{{post.title}}</td>
+                        <td>{{post.publicated}}</td>
+                        <td>{% if post.state %}PUBLISHED{% else %}IN PROGRESS{% endif %}</td>
+                        <td><a href="index.php?p=viewpost&id={{post.id}}">View</a></td>
+                        <td>{% if post.state %}{% else %}<a href="index.php?p=editpost&id={{post.id}}">Edit</a>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
