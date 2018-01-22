@@ -49,4 +49,26 @@ class postController {
         return $template->render($template_params);
     }
 
+    public function published() {
+        require_once 'menuController.php';
+        require_once 'twig/lib/Twig/Autoloader.php';
+        $menuCtrl = new menuController();
+        $authorization = $_SESSION["user"]->getType();
+        $menu = $menuCtrl->render($authorization);
+
+        $conPostDB = new dbPost();
+        $conPostDB->Connect();
+        $posts = $conPostDB->getPublished();
+        $conPostDB->Disconnect();
+
+        Twig_Autoloader::register();
+        $loader = new Twig_Loader_Filesystem('view');
+        $twig = new Twig_Environment($loader);
+        $template = $twig->loadTemplate('published.html');
+        $template_params = array();
+        $template_params["menu"] = $menu;
+        $template_params["posts"] = $posts;
+        return $template->render($template_params);
+    }
+
 }

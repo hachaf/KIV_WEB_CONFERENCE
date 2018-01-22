@@ -102,6 +102,11 @@ if (array_key_exists("p",  $_GET)) {
             echo $postCtrl->myPosts();
             break;
 
+        case "published":
+            $postCtrl = new postController();
+            echo $postCtrl->published();
+            break;
+
         case "editpost":
             if (array_key_exists("title", $_POST) && array_key_exists("abstract", $_POST)) {
                 $dbPostConnect = new dbPost();
@@ -143,7 +148,7 @@ if (array_key_exists("p",  $_GET)) {
                 $dbPostConnect->update($post);
                 $dbPostConnect->Disconnect();
             }
-            //TODO: ulozeni, upravit dbcon
+
             if (!array_key_exists("id", $_GET)) {
                 echo $homeCtrl->indexAction($_SESSION["user"]);
             } else {

@@ -151,6 +151,18 @@ class dbPost extends dbBase {
         return $posts;
     }
 
+    function getPublished() {
+        $query = "select * from post where state = 1;";
+        $statement = $this->connection->prepare($query);
+        $statement->execute();
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $posts = array();
+        foreach ($rows as $row) {
+            array_push($posts, new post($row));
+        }
+        return $posts;
+    }
+
 }
 
 ?>
