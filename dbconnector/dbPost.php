@@ -23,7 +23,11 @@ class dbPost extends dbBase {
         $statement->execute();
 
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return $rows;
+        $posts = array();
+        foreach ($rows as $row) {
+            array_push($posts, new post($row));
+        }
+        return $posts;
     }
 
     function getById($id) {

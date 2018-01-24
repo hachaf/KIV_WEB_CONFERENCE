@@ -12,6 +12,7 @@ include_once ('controller/userController.php');
 include_once ('controller/postController.php');
 include_once ('dbconnector/dbConUser.php');
 include_once ('dbconnector/dbPost.php');
+include_once ('dbconnector/dbAssignment.php');
 
 $connector_dbReview = new dbReview();
 $connector_dbReview->Connect();
@@ -107,9 +108,28 @@ if (array_key_exists("p",  $_GET)) {
             echo $postCtrl->published();
             break;
 
+        case "allposts":
+            $postCtrl = new postController();
+            echo $postCtrl->allPosts();
+            break;
+
         case "viewpost":
             $postCtrl = new postController();
             echo $postCtrl->view($_GET["id"]);
+            break;
+
+        case "assignpost":
+            $dbAssignmentConnection = new dbAssignment();
+            $dbAssignmentConnection->Connect();
+            if (array_key_exists("add", $_GET)) {
+                $dbAssignmentConnection->assignPost($_GET["id"], $_GET["add"]);
+            }
+            if (array_key_exists("rem", $_GET)) {
+                $dbAssignmentConnection->unassignPost($_GET["id"], $_GET["rem"]);
+            }
+            $dbAssignmentConnection->Disconnect();
+            $postCtrl = new postController();
+            echo $postCtrl->assign($_GET["id"]);
             break;
 
         case "createpost":

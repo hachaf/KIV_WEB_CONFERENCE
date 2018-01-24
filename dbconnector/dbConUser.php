@@ -32,6 +32,18 @@ class dbConUser extends dbBase {
         return $users;
     }
 
+    function getReviewers()  {
+        $query = "select * from conuser where TYPE = 'REV';";
+        $statement = $this->connection->prepare($query);
+        $statement->execute();
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $users = array();
+        foreach ($rows as $row) {
+            array_push($users, new conUser($row));
+        }
+        return $users;
+    }
+
     function getById($id) {
         $query = "select * from conuser where id = $id;";
         $statement = $this->connection->prepare($query);
