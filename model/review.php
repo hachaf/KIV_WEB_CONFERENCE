@@ -10,15 +10,17 @@ class review {
     private $locked;
     private $publicated;
 
-    function review($row) {
-        if (sizeof($row) == 7) {
-            $this->id = $row['ID'];
-            $this->authorID = $row['AUTHOR_ID'];
-            $this->postID = $row['POST_ID'];
-            $this->text = $row['TEXT'];
-            $this->verdict = $row['VERDICT'];
-            $this->locked = $row['LOCKED'];
-            $this->publicated = $row['PUBLICATED'];
+    function review($row = null) {
+        if ($row != null) {
+            if (sizeof($row) == 7) {
+                $this->id = $row['ID'];
+                $this->authorID = $row['AUTHOR_ID'];
+                $this->postID = $row['POST_ID'];
+                $this->text = $row['TEXT'];
+                $this->verdict = $row['VERDICT'];
+                $this->locked = $row['LOCKED'];
+                $this->publicated = $row['PUBLICATED'];
+            }
         }
     }
 

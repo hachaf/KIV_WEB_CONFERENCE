@@ -152,6 +152,13 @@ class dbPost extends dbBase {
         return $posts;
     }
 
+    function publishPost($postId) {
+        $query = "UPDATE POST SET STATE = 1 WHERE ID = :postId;";
+        $statement = $this->connection->prepare($query);
+        $statement->bindParam(":postId", $postId);
+        $statement->execute();
+    }
+
 }
 
 ?>

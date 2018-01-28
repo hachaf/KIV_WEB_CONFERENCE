@@ -64,7 +64,7 @@ class dbReview extends dbBase {
         $pars["TEXT"] = $review->getText();
         $pars["VERDICT"] = $review->getVerdict();
         $pars["LOCKED"] = $review->getLocked();
-        $pars["PUBLICATED"] = $review->getPublicated();
+        $pars["PUBLICATED"] = "STR_TO_DATE('" . $review->getPublicated() . "', '%Y-%m-%d')";
 
         $insert_columns = "";
         $insert_values  = "";
@@ -160,6 +160,17 @@ class dbReview extends dbBase {
         $stmt = $this->connection->prepare($stmt_text);
         $stmt->bindValue(1, $id);
         $stmt->execute();
+    }
+
+    function reviewsCount($postId) {
+        $query = "SELECT COUNT(1) FROM REVIEW WHERE POST_ID = :postId;";
+        $stmt = $this->connection->prepare($query);
+        $stmt->bindParam(':postId', $postId);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $row = array_pop($rows);
+        $count = array_pop($row);
+        return $count;
     }
 
 }

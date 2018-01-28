@@ -113,6 +113,36 @@ if (array_key_exists("p",  $_GET)) {
             echo $postCtrl->allPosts();
             break;
 
+        case "assignedposts":
+            $postCtrl = new postController();
+            echo $postCtrl->assignedPosts($_SESSION["user"]->getID());
+            break;
+
+        case "addreview":
+            if (array_key_exists("reviewtext", $_POST)) {
+                $review = new review();
+                $review->setText($_POST["reviewtext"]);
+                $review->setAuthorID($_SESSION["user"]->getID());
+                $review->setPostID($_GET["id"]);
+                $review->setVerdict(1);
+                $review->setLocked(0);
+                $review->setPublicated(date("m.d.y"));
+                $reviewDb = new dbReview();
+                $reviewDb->Connect();
+                $reviewDb->create($review);
+                $countOfReviews = $reviewDb->reviewsCount($_GET["id"]);
+                $reviewDb->Disconnect();
+                if ($countOfReviews >= 3) {
+                    $dbPost = new dbPost();
+                    $dbPost->Connect();
+                    $dbPost->publishPost($_GET["id"]);
+                    $dbPost->Disconnect();
+                }
+            }
+            $postCtrl = new postController();
+            echo $postCtrl->addReview($_GET["id"]);
+            break;
+
         case "viewpost":
             $postCtrl = new postController();
             echo $postCtrl->view($_GET["id"]);
