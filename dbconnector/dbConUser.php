@@ -20,11 +20,10 @@ class dbConUser extends dbBase {
      *  Načíst všechny předměty. Z důvodu srozumitelnosti kombinuji češtinu a angličtinu.
      */
     function getAll()  {
-        $query = "select * from conuser;";
+        $query = "SELECT * FROM CONUSER;";
         $statement = $this->connection->prepare($query);
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-
         $users = array();
         foreach ($rows as $row) {
             array_push($users, new conUser($row));
@@ -33,7 +32,7 @@ class dbConUser extends dbBase {
     }
 
     function getReviewers()  {
-        $query = "select * from conuser where TYPE = 'REV';";
+        $query = "SELECT * FROM CONUSER WHERE TYPE = 'REV';";
         $statement = $this->connection->prepare($query);
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -45,11 +44,11 @@ class dbConUser extends dbBase {
     }
 
     function getById($id) {
-        $query = "select * from conuser where id = $id;";
+        $query = "SELECT * FROM CONUSER WHERE ID = :id;";
         $statement = $this->connection->prepare($query);
+        $statement->bindParam(":id", $id);
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-
         if(sizeof($rows) == 0) {
             return null;
         } else {
@@ -60,41 +59,17 @@ class dbConUser extends dbBase {
 
     function create($user) {
         if ($user == null) return null;
+        $login = $user->getLogin();
+        $password = $user->getPassword();
+        $type = $user->getType();
+        $blocked = $user->getBlocked() ? 1 : 0;
 
-        $pars = array();
-        $pars["LOGIN"] = $user->getLogin();
-        $pars["PASSWORD"] = $user->getPassword();
-        $pars["TYPE"] = $user->getType();
-        if ($user->getBlocked()) {
-            $pars["BLOCKED"] = "1";
-        } else {
-            $pars["BLOCKED"] = "0";
-        };
-
-        // SLOZIT TEXT STATEMENTU s otaznikama
-        $insert_columns = "";
-        $insert_values  = "";
-
-        if ($pars != null)
-            foreach ($pars as $column => $value) {
-                // pridat carky
-                if ($insert_columns != "") $insert_columns .= ", ";
-                if ($insert_columns != "") $insert_values .= ", ";
-
-                $insert_columns .= "`$column`";
-                $insert_values .= "?";
-            }
-
-        $stmt_text = "insert into `conuser` ($insert_columns) values ($insert_values);";
+        $stmt_text = "INSERT INTO CONUSER (LOGIN, PASSORD, TYPE, BLOCKED) values (:login, :password, :type, :blocked);";
         $stmt = $this->connection->prepare($stmt_text);
-
-        $bind_param_number = 1;
-
-        foreach ($pars as $column => $value) {
-            $stmt->bindValue($bind_param_number, $value);  // vzdy musim dat value, abych si nesparoval promennou (to nechci)
-            $bind_param_number ++;
-        }
-
+        $stmt->bindParam(":login", $login);
+        $stmt->bindParam(":password", $password);
+        $stmt->bindParam(":type", $type);
+        $stmt->bindParam(":blocked", $blocked);
         $stmt->execute();
 
         $item_id = $this->connection->lastInsertId();
@@ -105,59 +80,34 @@ class dbConUser extends dbBase {
     function update($user) {
         if ($user == null) return null;
 
-        $pars = array();
-        $pars["LOGIN"] = "'" . $user->getLogin() . "'";
-        $pars["PASSWORD"] = "'" . $user->getPassword() . "'";
-        $pars["TYPE"] = "'" . $user->getType() . "'";
-        if ($user->getBlocked()) {
-            $pars["BLOCKED"] = "1";
-        } else {
-            $pars["BLOCKED"] = "0";
-        }
-        $pars["ID"] = $user->getID();
+        $login = $user->getLogin();
+        $password = $user->getPassword();
+        $type = $user->getType();
+        $blocked = $user->getBlocked() ? 1 : 0;
+        $id = $user->getID();
 
-        // SLOZIT TEXT STATEMENTU s otaznikama
-        $insert_columns = "";
-        $insert_values  = "";
-
-        foreach ($pars as $column => $value) {
-            // pridat carky
-            if ($insert_columns != "") $insert_columns .= ", ";
-            if ($insert_columns != "") $insert_values .= ", ";
-
-            $insert_columns .= "`$column`";
-            $insert_values .= "?";
-        }
-
-        $stmt_text = 'UPDATE CONUSER SET LOGIN = '
-            . $pars["LOGIN"]
-            . ', PASSWORD = ' . $pars["PASSWORD"]
-            . ', TYPE = ' . $pars["TYPE"]
-            . ', BLOCKED = ' . $pars["BLOCKED"] .' WHERE ID = ' .  $pars["ID"] . ';';
+        $stmt_text = 'UPDATE CONUSER SET LOGIN = :login, PASSWORD = :password, TYPE = :type, 
+                      BLOCKED = :blocked WHERE ID = :id;';
 
         $stmt = $this->connection->prepare($stmt_text);
-
-        $bind_param_number = 1;
-
-        foreach ($pars as $column => $value) {
-            $stmt->bindValue($bind_param_number, $value);
-            $bind_param_number ++;
-        }
-
+        $stmt->bindParam(":login", $login);
+        $stmt->bindParam(":password", $password);
+        $stmt->bindParam(":type", $type);
+        $stmt->bindParam(":blocked", $blocked);
+        $stmt->bindParam(":id", $id);
         $stmt->execute();
         return $user;
     }
 
     function remove($id) {
-        if (!is_int($id)) return null;
-        $stmt_text = 'DELETE FROM CONUSER WHERE ID = ' . $id . ';';
+        $stmt_text = 'DELETE FROM CONUSER WHERE ID = :id;';
         $stmt = $this->connection->prepare($stmt_text);
-        $stmt->bindValue(1, $id);
+        $stmt->bindParam(":id", $id);
         $stmt->execute();
     }
 
     function getByNameAndPwd($username, $pwd) {
-        $stmt = $this->connection->prepare("select * from conuser where (login=:login and password=:password)");
+        $stmt = $this->connection->prepare("SELECT * FROM CONUSER WHERE (LOGIN = :login AND PASSWORD = :password)");
         $stmt->bindParam(':login', $username);
         $stmt->bindParam(':password', $pwd);
         $stmt->execute();
@@ -167,7 +117,7 @@ class dbConUser extends dbBase {
     }
 
     function userExist($username) {
-        $stmt = $this->connection->prepare("select count(1) from conuser where (login=:login)");
+        $stmt = $this->connection->prepare("SELECT COUNT(1) FROM CONUSER WHERE (LOGIN = :login)");
         $stmt->bindParam(':login', $username);
         $stmt->execute();
         $res = $stmt->fetch(PDO::FETCH_COLUMN, 0);

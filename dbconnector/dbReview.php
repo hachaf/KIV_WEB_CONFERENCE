@@ -19,7 +19,7 @@ class dbReview extends dbBase {
      *  Načte všechny recenze v databázi a vrátí je v poli
      */
     function getAll() {
-        $query = "select * from review;";
+        $query = "SELECT * FROM REVIEW;";
         $statement = $this->connection->prepare($query);
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -37,11 +37,11 @@ class dbReview extends dbBase {
      */
     function getById($id) {
         if (!is_int($id)) return null;
-        $query = "select * from review where id = $id;";
+        $query = "SELECT * FROM REVIEW WHERE ID = :id;";
         $statement = $this->connection->prepare($query);
+        $statement->bindParam(':id', $id);
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-
         if(sizeof($rows) == 0) {
             return null;
         } else {
@@ -57,34 +57,22 @@ class dbReview extends dbBase {
      */
     function create($review) {
         if ($review == null) return null;
+        $authorId = $review->getAuthorID();
+        $postId = $review->getPostID();
+        $text = $review->getText();
+        $verdict = $review->getVerdict();
+        $locked = $review->getLocked();
+        $publicated = "STR_TO_DATE('" . $review->getPublicated() . "', '%Y-%m-%d')";
 
-        $pars = array();
-        $pars["AUTHOR_ID"] = $review->getAuthorID();
-        $pars["POST_ID"] = $review->getPostID();
-        $pars["TEXT"] = $review->getText();
-        $pars["VERDICT"] = $review->getVerdict();
-        $pars["LOCKED"] = $review->getLocked();
-        $pars["PUBLICATED"] = "STR_TO_DATE('" . $review->getPublicated() . "', '%Y-%m-%d')";
-
-        $insert_columns = "";
-        $insert_values  = "";
-
-        if ($pars != null)
-            foreach ($pars as $column => $value) {
-                if ($insert_columns != "") $insert_columns .= ", ";
-                if ($insert_columns != "") $insert_values .= ", ";
-                $insert_columns .= "`$column`";
-                $insert_values .= "?";
-            }
-
-        $stmt_text = "insert into `review` ($insert_columns) values ($insert_values);";
+        $stmt_text = "INSERT INTO REVIEW (AUTHOR_ID, POST_ID, TEXT, VERDICT, LOCKED, PUBLICATED) VALUES
+                      (:authorId, :postId, :text, :verdict, :locked, :publicated);";
         $stmt = $this->connection->prepare($stmt_text);
-        $bind_param_number = 1;
-
-        foreach ($pars as $column => $value) {
-            $stmt->bindValue($bind_param_number, $value);
-            $bind_param_number ++;
-        }
+        $stmt->bindParam(':authorId', $authorId);
+        $stmt->bindParam(':postId', $postId);
+        $stmt->bindParam(':text', $text);
+        $stmt->bindParam(':verdict', $verdict);
+        $stmt->bindParam(':locked', $locked);
+        $stmt->bindParam(':publicated', $publicated);
 
         $stmt->execute();
         $item_id = $this->connection->lastInsertId();
@@ -100,50 +88,26 @@ class dbReview extends dbBase {
     function update($review) {
         if ($review == null) return null;
 
-        $pars = array();
+        $postId = $review->getPostID();
+        $text = $review->getText();
+        $authorId = $review->getAuthorID();
+        $publicated = "STR_TO_DATE('" . $review->getPublicated() . "', '%Y-%m-%d')";
+        $verdict = $review->getVerdict() ? 1 : 0;
+        $locked = $review->getLocked() ? 1 : 0;
+        $id = $review->getID();
 
-        $pars["POST_ID"] = $review->getPostID();
-        $pars["TEXT"] = "'" . $review->getText() . "'";
-        $pars["AUTHOR_ID"] = $review->getAuthorID();
-        $pars["PUBLICATED"] = "STR_TO_DATE('" . $review->getPublicated() . "', '%Y-%m-%d')";
-        if ($review->getVerdict()) {
-            $pars["VERDICT"] = "1";
-        } else {
-            $pars["VERDICT"] = "0";
-        }
-        if ($review->getLocked()) {
-            $pars["LOCKED"] = "1";
-        } else {
-            $pars["LOCKED"] = "0";
-        }
-        $pars["ID"] = $review->getID();
-
-        $insert_columns = "";
-        $insert_values  = "";
-
-        foreach ($pars as $column => $value) {
-            if ($insert_columns != "") $insert_columns .= ", ";
-            if ($insert_columns != "") $insert_values .= ", ";
-            $insert_columns .= "`$column`";
-            $insert_values .= "?";
-        }
-
-        $stmt_text = 'UPDATE REVIEW SET AUTHOR_ID = '
-            . $pars["AUTHOR_ID"]
-            . ', POST_ID = ' . $pars["POST_ID"]
-            . ', TEXT = ' . $pars["TEXT"]
-            . ', PUBLICATED = ' . $pars["PUBLICATED"]
-            . ', LOCKED = ' . $pars["LOCKED"]
-            . ', VERDICT = ' . $pars["VERDICT"]
-            .' WHERE ID = ' .  $pars["ID"] . ';';
+        $stmt_text = 'UPDATE REVIEW SET AUTHOR_ID = :authorId, POST_ID = :postId, TEXT = :text,
+                      PUBLICATED = :publicated, LOCKED = :locked, VERDICT = :verdict 
+                      WHERE ID = :id;';
 
         $stmt = $this->connection->prepare($stmt_text);
-        $bind_param_number = 1;
-
-        foreach ($pars as $column => $value) {
-            $stmt->bindValue($bind_param_number, $value);
-            $bind_param_number ++;
-        }
+        $stmt->bindParam(':authorId', $authorId);
+        $stmt->bindParam(':postId', $postId);
+        $stmt->bindParam(':text', $text);
+        $stmt->bindParam(':verdict', $verdict);
+        $stmt->bindParam(':locked', $locked);
+        $stmt->bindParam(':publicated', $publicated);
+        $stmt->bindParam(':id', $id);
 
         $stmt->execute();
         return $review;
@@ -155,10 +119,9 @@ class dbReview extends dbBase {
      * @return null
      */
     function remove($id) {
-        if (!is_int($id)) return null;
-        $stmt_text = 'DELETE FROM REVIEW WHERE ID = ' . $id . ';';
+        $stmt_text = 'DELETE FROM REVIEW WHERE ID = :id;';
         $stmt = $this->connection->prepare($stmt_text);
-        $stmt->bindValue(1, $id);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
     }
 

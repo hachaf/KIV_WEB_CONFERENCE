@@ -16,12 +16,10 @@ class dbPost extends dbBase {
         $this->connection_type = DB_CONNECTION_USE_PDO_MYSQL;
     }
 
-    function getAll()
-    {
-        $query = "select * from post;";
+    function getAll() {
+        $query = "SELECT * FROM POST;";
         $statement = $this->connection->prepare($query);
         $statement->execute();
-
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         $posts = array();
         foreach ($rows as $row) {
@@ -31,11 +29,11 @@ class dbPost extends dbBase {
     }
 
     function getById($id) {
-        $query = "select * from post where id = $id;";
+        $query = "SELECT * FROM POST WHERE ID = :id;";
         $statement = $this->connection->prepare($query);
+        $statement->bindParam(":id", $id);
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-
         if(sizeof($rows) == 0) {
             return null;
         } else {
@@ -72,48 +70,25 @@ class dbPost extends dbBase {
 
     function update($post) {
         if ($post == null) return null;
+        $authorId = $post->getAuthorID();
+        $abstract = $post->getAbstract();
+        $filename = $post->getFilename();
+        $publicated = "STR_TO_DATE('" . $post->getPublicated() . "', '%Y-%m-%d')";
+        $title = $post->getTitle();
+        $state = $post->getState() ? 1 : 0;
+        $id = $post->getID();
 
-        $pars = array();
-        $pars["AUTHOR_ID"] = $post->getAuthorID();
-        $pars["ABSTRACT"] = "'" . $post->getAbstract() . "'";
-        $pars["FILENAME"] = "'" . $post->getFilename() . "'";
-        $pars["PUBLICATED"] = "STR_TO_DATE('" . $post->getPublicated() . "', '%Y-%m-%d')";
-        $pars["TITLE"] = "'" . $post->getTitle() . "'";
-        if ($post->getState()) {
-            $pars["STATE"] = "1";
-        } else {
-            $pars["STATE"] = "0";
-        }
-        $pars["ID"] = $post->getID();
-
-        $insert_columns = "";
-        $insert_values  = "";
-
-        foreach ($pars as $column => $value) {
-            if ($insert_columns != "") $insert_columns .= ", ";
-            if ($insert_columns != "") $insert_values .= ", ";
-
-            $insert_columns .= "`$column`";
-            $insert_values .= "?";
-        }
-
-        $stmt_text = 'UPDATE POST SET AUTHOR_ID = '
-            . $pars["AUTHOR_ID"]
-            . ', ABSTRACT = ' . $pars["ABSTRACT"]
-            . ', FILENAME = ' . $pars["FILENAME"]
-            . ', PUBLICATED = ' . $pars["PUBLICATED"]
-            . ', TITLE = ' . $pars["TITLE"]
-            . ', STATE = ' . $pars["STATE"]
-            .' WHERE ID = ' .  $pars["ID"] . ';';
-
+        $stmt_text = "UPDATE POST SET AUTHOR_ID = :authorId, ABSTRACT = :abstract, 
+                      FILENAME = :filename, PUBLICATED = :publicated, TITLE = :title, STATE = :state
+                      WHERE ID = :id;";
         $stmt = $this->connection->prepare($stmt_text);
-        $bind_param_number = 1;
-
-        foreach ($pars as $column => $value) {
-            $stmt->bindValue($bind_param_number, $value);
-            $bind_param_number ++;
-        }
-
+        $stmt->bindParam(":authorId", $authorId);
+        $stmt->bindParam(":abstract", $abstract);
+        $stmt->bindParam(":publicated", $publicated);
+        $stmt->bindParam(":filename", $filename);
+        $stmt->bindParam(":state", $state);
+        $stmt->bindParam(":title", $title);
+        $stmt->bindParam(":id", $id);
         $stmt->execute();
         return $post;
     }
@@ -128,7 +103,7 @@ class dbPost extends dbBase {
     }
 
     function getByAuthor($authorId) {
-        $query = "select * from post where author_id = :authorId;";
+        $query = "SELECT * FROM POST WHERE AUTHOR_ID = :authorId;";
         $statement = $this->connection->prepare($query);
         $statement->bindParam(":authorId", $authorId);
         $statement->execute();
@@ -141,7 +116,7 @@ class dbPost extends dbBase {
     }
 
     function getPublished() {
-        $query = "select * from post where state = 1;";
+        $query = "SELECT * FROM POST WHERE STATE = 1;";
         $statement = $this->connection->prepare($query);
         $statement->execute();
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
