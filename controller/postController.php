@@ -4,9 +4,12 @@ include_once ('dbconnector/dbPost.php');
 include_once ('dbconnector/dbConUser.php');
 include_once ('dbconnector/dbAssignment.php');
 
-class postController {
+class postController extends baseController {
 
     public function myPosts() {
+        if ($_SESSION["user"]->getType() != 'AUT') {
+            return $this->notAuthorized();
+        }
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
@@ -53,6 +56,9 @@ class postController {
     }
 
     public function assignedPosts($id) {
+        if ($_SESSION["user"]->getType() != 'REV') {
+            return $this->notAuthorized();
+        }
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
@@ -76,6 +82,9 @@ class postController {
     }
 
     public function create() {
+        if ($_SESSION["user"]->getType() != 'AUT') {
+            return $this->notAuthorized();
+        }
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
@@ -92,6 +101,9 @@ class postController {
     }
 
     public function edit($id) {
+        if ($_SESSION["user"]->getType() != 'AUT') {
+            return $this->notAuthorized();
+        }
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
@@ -158,6 +170,9 @@ class postController {
     }
 
     public function addReview($id) {
+        if ($_SESSION["user"]->getType() != 'REV') {
+            return $this->notAuthorized();
+        }
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
@@ -180,6 +195,9 @@ class postController {
     }
 
     public function assign($id) {
+        if ($_SESSION["user"]->getType() != 'ADM') {
+            return $this->notAuthorized();
+        }
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();

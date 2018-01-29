@@ -119,6 +119,13 @@ if (array_key_exists("p",  $_GET)) {
             break;
 
         case "addreview":
+            $postCtrl = new postController();
+            $reviewDb = new dbReview();
+            $reviewDb->Connect();
+            if ($reviewDb->hasReviewed($_SESSION["user"]->getID(), $_GET["id"])) {
+                echo $postCtrl->message("You have already reviewed this post.");
+                break;
+            }
             if (array_key_exists("reviewtext", $_POST)) {
                 $review = new review();
                 $review->setText($_POST["reviewtext"]);
@@ -127,8 +134,6 @@ if (array_key_exists("p",  $_GET)) {
                 $review->setVerdict(1);
                 $review->setLocked(0);
                 $review->setPublicated(date("m.d.y"));
-                $reviewDb = new dbReview();
-                $reviewDb->Connect();
                 $reviewDb->create($review);
                 $countOfReviews = $reviewDb->reviewsCount($_GET["id"]);
                 $reviewDb->Disconnect();
@@ -139,7 +144,6 @@ if (array_key_exists("p",  $_GET)) {
                     $dbPost->Disconnect();
                 }
             }
-            $postCtrl = new postController();
             echo $postCtrl->addReview($_GET["id"]);
             break;
 

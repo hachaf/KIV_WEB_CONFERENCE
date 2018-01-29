@@ -3,7 +3,7 @@
 include_once ('dbconnector/dbConUser.php');
 include_once 'menuController.php';
 
-class userController {
+class userController extends baseController {
 
     public function usersList() {
         require_once 'menuController.php';
@@ -16,6 +16,10 @@ class userController {
         } else {
             $authorization = 'NON';
             $menu = $menuCtrl->render($authorization);
+        }
+
+        if ($authorization != 'ADM') {
+            return $this->notAuthorized();
         }
 
         $conUserDB = new dbConUser();
@@ -35,6 +39,10 @@ class userController {
     }
 
     public function edit($id) {
+        if ($_SESSION["user"]->getType() != 'ADM') {
+            return $this->notAuthorized();
+        }
+
         $conUserDB = new dbConUser();
         $conUserDB->Connect();
         $user = $conUserDB->getById($id);
@@ -56,6 +64,9 @@ class userController {
     }
 
     public function save($id, $login, $password, $type, $blocked) {
+        if ($_SESSION["user"]->getType() != 'ADM') {
+            return $this->notAuthorized();
+        }
         $conUserDB = new dbConUser();
         $conUserDB->Connect();
         $user = $conUserDB->getById($id);

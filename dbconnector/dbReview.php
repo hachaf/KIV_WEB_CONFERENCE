@@ -136,4 +136,16 @@ class dbReview extends dbBase {
         return $count;
     }
 
+    function hasReviewed($authorId, $postId) {
+        $query = "SELECT COUNT(1) FROM REVIEW WHERE POST_ID = :postId AND AUTHOR_ID = :authorId;";
+        $stmt = $this->connection->prepare($query);
+        $stmt->bindParam(':postId', $postId);
+        $stmt->bindParam(':authorId', $authorId);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $row = array_pop($rows);
+        $count = array_pop($row);
+        return ($count > 0);
+    }
+
 }

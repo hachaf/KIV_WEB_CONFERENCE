@@ -2,55 +2,29 @@
 
 class baseController {
 
-    public function loginAction() {
-        $content = file_get_contents("./view/login.php");
-        return $content;
+    public function notAuthorized() {
+        return $this->message("You are not authorized.");
     }
 
-//    private $twig;
-//
-//    public function __construct($twig) {
-//        $this->twig = $twig;
-//    }
-//
-//    public function indexAction($params) {
-//        echo "missing indexAction method";
-//    }
-//
-//    public function makeUrl() {
-//        return "tady bude URL";//TODO
-//    }
+    public function message($message) {
+        require_once 'menuController.php';
+        require_once 'twig/lib/Twig/Autoloader.php';
+        $menuCtrl = new menuController();
+        if (array_key_exists("user", $_SESSION)) {
+            $authorization = $_SESSION["user"]->getType();
+        } else {
+            $authorization = 'NON';
+        }
+        $menu = $menuCtrl->render($authorization);
 
-    //public function render($obsah, $menu) {
-//        $loader = new Twig_Loader_Filesystem('view');
-//        $twig = new Twig_Environment($loader); // takhle je to bez cache
-//        // nacist danou sablonu z adresare
-//        $template = $twig->loadTemplate('view1.html');
-//
-//        // render vrati data pro vypis nebo display je vypise
-//        // v poli jsou data pro vlozeni do sablony
-//        $template_params = array();
-//        $template_params["obsah"] = $obsah;
-//        $template_params["nadpis1"] = "Nadpis 1";
-//        echo $template->render($template_params);
-
-        //$template = $this->twig->loadTemplate('view1.html');
-        //$template_params = array();
-        //$template_params["obsah"] = $obsah;
-        //$template_params["nadpis1"] = "Nadpis 1";
-        //echo $template->render($template_params);
-
-//            echo "<!DOCTYPE html>
-//            <html>
-//                <head>
-//                    <meta charset=\"UTF-8\">
-//                </head>
-//            <body>";
-//            echo $menu;
-//            echo "<h1>Start sablony</h1>";
-//            echo $obsah;
-//            echo "<div>Footer</div>";
-//            echo "</body></html>";
-    //}
+        Twig_Autoloader::register();
+        $loader = new Twig_Loader_Filesystem('view');
+        $twig = new Twig_Environment($loader);
+        $template = $twig->loadTemplate('message.html');
+        $template_params = array();
+        $template_params["menu"] = $menu;
+        $template_params["message"] = $message;
+        return $template->render($template_params);
+    }
 
 }
