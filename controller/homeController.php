@@ -37,7 +37,7 @@ class homeController extends baseController {
         return $template->render($template_params);
     }
 
-    public function login() {
+    public function login($msg = null) {
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
 
@@ -51,10 +51,11 @@ class homeController extends baseController {
         $template = $twig->loadTemplate('login.html');
 
         $template_params["menu"] = $menu;
+        $template_params["msg"] = $msg;
         return $template->render($template_params);
     }
 
-    public function register($user, $regMsg = null) {
+    public function register($user, $msg = null) {
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
@@ -74,7 +75,7 @@ class homeController extends baseController {
         $template = $twig->loadTemplate('register.html');
 
         $template_params["menu"] = $menu;
-        $template_params["regMsg"] = $regMsg;
+        $template_params["msg"] = $msg;
         return $template->render($template_params);
     }
 

@@ -8,6 +8,10 @@ body {
   padding-top: 54px;
   color: #868e96; }
 
+p.valid-msg {
+  color: #721c24 !important;
+}
+
 @media (min-width: 992px) {
   body {
     padding-top: 0;
@@ -113,3 +117,4 @@ a {
   color: #606060; }
   a:hover, a:focus, a:active {
     color: #824027; }
+

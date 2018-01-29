@@ -44,9 +44,12 @@ if (array_key_exists("p",  $_GET)) {
                 if ($user != null) {
                     $_SESSION["user"] = $user;
                     echo $homeCtrl->indexAction($_SESSION["user"]);
+                } else {
+                    echo $homeCtrl->login("Wrong login or password");
                 }
+            } else {
+                echo $homeCtrl->login();
             }
-            echo $homeCtrl->login();
             break;
 
         case "logout":
@@ -67,8 +70,8 @@ if (array_key_exists("p",  $_GET)) {
                     $connector_dbUser->create($user);
                     echo $homeCtrl->register($user);
                 } else { //uzivatel jiz existuje
-                    $regMsg = 'User with this name already exists.';
-                    echo $homeCtrl->register(null, $regMsg);
+                    $msg = 'User with this name already exists.';
+                    echo $homeCtrl->register(null, $msg);
                 }
             } else {
                 echo $homeCtrl->register(null);
@@ -78,11 +81,7 @@ if (array_key_exists("p",  $_GET)) {
         case "edituser":
             if (array_key_exists("login", $_POST)) {
                 $userCtrl = new userController();
-                if (isset($_POST["blocked"]) && $_POST["blocked"] == 1) {
-                    $blocked = 1;
-                } else {
-                    $blocked = 0;
-                }
+                $blocked = (isset($_POST["blocked"]) && $_POST["blocked"] == 1) ? 1 : 0;
                 $userCtrl->save($_GET["id"], $_POST["login"], $_POST["password"], $_POST["type"], $blocked);
             }
             if (array_key_exists("id", $_GET)) {
@@ -167,7 +166,23 @@ if (array_key_exists("p",  $_GET)) {
             break;
 
         case "createpost":
-            if (array_key_exists("title", $_POST) && array_key_exists("abstract", $_POST) && array_key_exists("pdffile", $_FILES)) {
+            $postCtrl = new postController();
+            if (array_key_exists("title", $_POST) || array_key_exists("abstract", $_POST) || array_key_exists("pdffile", $_FILES)) {
+                if (!array_key_exists("title", $_POST)) {
+                    $msg = "Title required";
+                    echo $postCtrl->create($msg);
+                    break;
+                }
+                if (!array_key_exists("abstract", $_POST)) {
+                    $msg = "Abstract required";
+                    echo $postCtrl->create($msg);
+                    break;
+                }
+                if (!array_key_exists("pdffile", $_POST)) {
+                    $msg = "PDF file required";
+                    echo $postCtrl->create($msg);
+                    break;
+                }
                 $post = new post();
                 $post->setTitle($_POST["title"]);
                 $post->setAbstract($_POST["abstract"]);
@@ -211,13 +226,27 @@ if (array_key_exists("p",  $_GET)) {
                 $dbPostConnect->update($post);
                 $dbPostConnect->Disconnect();
             }
-
-
-            $postCtrl = new postController();
             echo $postCtrl->create();
             break;
 
         case "editpost":
+            $postCtrl = new postController();
+            if (array_key_exists("title", $_POST) && !array_key_exists("abstract", $_POST)) {
+                $msg = "Abstract required";
+                echo $postCtrl->edit($_GET["id"], $msg);
+                break;
+            }
+            if (!array_key_exists("title", $_POST) && array_key_exists("abstract", $_POST)) {
+                $msg = "Title required";
+                echo $postCtrl->edit($_GET["id"], $msg);
+                break;
+            }
+
+            if (!isset($_FILES['pdffile']) || !array_key_exists("pdffile", $_FILES)) {
+                $msg = "Post PDF file required";
+                echo $postCtrl->edit($_GET["id"], $msg);
+                break;
+            }
             if (array_key_exists("title", $_POST) && array_key_exists("abstract", $_POST)) {
                 $dbPostConnect = new dbPost();
                 $dbPostConnect->Connect();
@@ -227,7 +256,7 @@ if (array_key_exists("p",  $_GET)) {
 
                 if (array_key_exists("pdffile", $_FILES)) {
                     if(isset($_FILES['pdffile'])){
-                        $errors= array();
+                        $errors = array();
                         $file_name = $_FILES['pdffile']['name'];
                         $file_size = $_FILES['pdffile']['size'];
                         $file_tmp  = $_FILES['pdffile']['tmp_name'];
@@ -248,9 +277,9 @@ if (array_key_exists("p",  $_GET)) {
                         if(empty($errors)==true){
                             move_uploaded_file($file_tmp,"posts/" . $post->getID() . ".pdf");
                             $post->setFilename($post->getID() . ".pdf");
-                            echo "Success";
+                            $msg = "Post edited";
                         }else{
-                            print_r($errors);
+                            $msg = "Error during file-uploading";
                         }
                     }
                 }
@@ -262,8 +291,7 @@ if (array_key_exists("p",  $_GET)) {
             if (!array_key_exists("id", $_GET)) {
                 echo $homeCtrl->indexAction($_SESSION["user"]);
             } else {
-                $postCtrl = new postController();
-                echo $postCtrl->edit($_GET["id"]);
+                echo $postCtrl->edit($_GET["id"], $msg);
             }
             break;
 

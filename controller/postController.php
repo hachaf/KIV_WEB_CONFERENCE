@@ -81,7 +81,7 @@ class postController extends baseController {
         return $template->render($template_params);
     }
 
-    public function create() {
+    public function create($msg = null) {
         if ($_SESSION["user"]->getType() != 'AUT') {
             return $this->notAuthorized();
         }
@@ -97,10 +97,11 @@ class postController extends baseController {
         $template = $twig->loadTemplate('createpost.html');
         $template_params = array();
         $template_params["menu"] = $menu;
+        $template_params["msg"] = $msg;
         return $template->render($template_params);
     }
 
-    public function edit($id) {
+    public function edit($id, $msg = null) {
         if ($_SESSION["user"]->getType() != 'AUT') {
             return $this->notAuthorized();
         }
@@ -121,6 +122,7 @@ class postController extends baseController {
         $template = $twig->loadTemplate('editpost.html');
         $template_params = array();
         $template_params["menu"] = $menu;
+        $template_params["msg"] = $msg;
         $template_params["post"] = $post;
         return $template->render($template_params);
     }
