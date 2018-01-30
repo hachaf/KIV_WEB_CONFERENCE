@@ -64,7 +64,7 @@ class dbConUser extends dbBase {
         $type = $user->getType();
         $blocked = $user->getBlocked() ? 1 : 0;
 
-        $stmt_text = "INSERT INTO CONUSER (LOGIN, PASSORD, TYPE, BLOCKED) values (:login, :password, :type, :blocked);";
+        $stmt_text = "INSERT INTO CONUSER (LOGIN, PASSWORD, TYPE, BLOCKED) values (:login, :password, :type, :blocked);";
         $stmt = $this->connection->prepare($stmt_text);
         $stmt->bindParam(":login", $login);
         $stmt->bindParam(":password", $password);

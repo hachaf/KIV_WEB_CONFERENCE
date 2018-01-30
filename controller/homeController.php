@@ -55,9 +55,30 @@ class homeController extends baseController {
         return $template->render($template_params);
     }
 
-    public function register($user, $msg = null) {
+    public function register() {
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
+
+        if (array_key_exists("reg-username", $_POST) && array_key_exists("reg-pwd", $_POST)) { //pokus o registraci;
+            $connector_dbUser = new dbConUser();
+            $connector_dbUser->Connect();
+            if (!$connector_dbUser->userExist($_POST["reg-username"])) { //uzivatel neni v databazi a lze je zalozit
+                $user = new conUser();
+                $user->setLogin($_POST["reg-username"]);
+                $user->setBlocked(0);
+                $user->setPassword($_POST["reg-pwd"]);
+                $user->setType("AUT");
+                $connector_dbUser->create($user);
+                $msg = "Registration successful. You can sign in now.";
+            } else { //uzivatel jiz existuje
+                $user = null;
+                $msg = 'User with this name already exists.';
+            }
+        } else {
+            $msg = null;
+            $user = null;
+        }
+
         $menuCtrl = new menuController();
 
         if ($user != null) {

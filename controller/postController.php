@@ -200,6 +200,11 @@ class postController extends baseController {
         $post = $conPostDB->getById($id);
         $conPostDB->Disconnect();
 
+        $conUserDB = new dbConUser();
+        $conUserDB->Connect();
+        $author = $conUserDB->getById($post->getID());
+        $conUserDB->Disconnect();
+
         Twig_Autoloader::register();
         $loader = new Twig_Loader_Filesystem('view');
         $twig = new Twig_Environment($loader);
@@ -207,6 +212,7 @@ class postController extends baseController {
         $template_params = array();
         $template_params["menu"] = $menu;
         $template_params["post"] = $post;
+        $template_params["author"] = $author;
         return $template->render($template_params);
     }
 

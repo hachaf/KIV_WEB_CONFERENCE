@@ -81,13 +81,13 @@
         $('#reg-username').change(function() {
             manageBtn();
         });
-        $('#password').change(function() {
+        $('#reg-pwd').change(function() {
             manageBtn();
         });
     });
 
     function manageBtn() {
-        if ($('#reg-username').val().length > 1 && $('#password').val().length > 1) {
+        if ($('#reg-username').val().length > 1 && $('#reg-pwd').val().length > 1) {
             $(':input[type="submit"]').prop('disabled', false);
         } else {
             $(':input[type="submit"]').prop('disabled', true);

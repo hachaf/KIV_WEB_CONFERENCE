@@ -292,7 +292,7 @@ class router {
 
     private function logout() {
         unset($_SESSION["user"]);
-        session_abort();
+        session_destroy();
         return $this->homeCtrl->indexAction(null);
     }
 
@@ -305,24 +305,7 @@ class router {
     }
 
     private function register() {
-        if (array_key_exists("reg-username", $_POST) && array_key_exists("reg-pwd", $_POST)) { //pokus o registraci
-            $connector_dbUser = new dbConUser();
-            $connector_dbUser->Connect();
-            if (!$connector_dbUser->userExist($_POST["reg-username"])) { //uzivatel neni v databazi a lze je zalozit
-                $user = new conUser();
-                $user->setLogin($_POST["reg-username"]);
-                $user->setBlocked(0);
-                $user->setPassword($_POST["reg-pwd"]);
-                $user->setType("AUT");
-                $connector_dbUser->create($user);
-                return $this->homeCtrl->register($user);
-            } else { //uzivatel jiz existuje
-                $msg = 'User with this name already exists.';
-                return $this->homeCtrl->register(null, $msg);
-            }
-        } else {
-            return $this->homeCtrl->register(null);
-        }
+        return $this->homeCtrl->register();
     }
 
     private function userlist() {
