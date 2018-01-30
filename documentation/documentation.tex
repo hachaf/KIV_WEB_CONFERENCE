@@ -1,0 +1,131 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage{hyperref}
+\usepackage{lmodern, cmap}
+\usepackage[T1]{fontenc}
+\usepackage[czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx, array, blindtext}
+\usepackage{ae}
+\usepackage[tc]{titlepic}
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+\usepackage{courier}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+backgroundcolor=\color{white}, % choose the background color
+basicstyle=\footnotesize\ttfamily,	% size of fonts used for the code
+breaklines=true, % automatic line breaking only at whitespace
+captionpos=b, % sets the caption-position to bottom
+commentstyle=\color{mygreen}, % comment style
+escapeinside={\%*}{*)}, % if you want to add LaTeX within your code
+keywordstyle=\color{blue}, % keyword style
+stringstyle=\color{mymauve}, % string literal style
+} 
+
+\begin{document}
+
+% nove makro pro automaticky popis a cislovani obrazku
+\newcommand{\obrazek}[1]{Obrázek \ref{#1}}
+% nove makro pro automaticky piopis a cislovani tabulek
+\newcommand{\tabulka}[1]{Tabulka \ref{#1}}
+
+\begin{titlepage}
+\begin{center}
+\includegraphics[width=0.65\textwidth]{fav.png} \\[0.5cm]  %logo
+\textsc{\Large KATEDRA INFORMATIKY A VÝPOČETNÍ TECHNIKY }\\[1cm]
+
+\textsc{\Large Semestrální práce z předmětu KIV/WEB}\\[1cm]
+
+\textsc{\Large Webové stránky konference}\\[0.5cm]
+
+{\large Filip Hácha -- A16B0036P} \\[0.5cm]
+{\large hachaf@students.zcu.cz}
+
+% Bottom of the page
+\vfill
+{\large \today}
+%\date{\today}
+
+\end{center}
+\end{titlepage}
+
+
+\tableofcontents % obsah
+\newpage
+
+\section{Zadání}
+\par Úkolem této práce bylo vytvořit webové stránky konference s libovolným tématem. Uživateli systému jsou autoři
+příspěvků (vkládají abstrakty a PDF dokumenty), recenzenti příspěvků (hodnotí příspěvky) a administrátoři
+(spravují uživatele, přiřazují příspěvky recenzentům a rozhodují o publikování příspěvků). Každý uživatel se bude do systému přihlašovat prostřednictvím uživatelského jména a hesla. Nepřihlášený uživatel vidí pouze publikované příspěvky.
+Nový uživatel se bude může zaregistrovat, čímž získá status autora.
+\par Přihlášený autor vidí svoje příspěvky a stav, ve kterém se nacházejí
+(v recenzním řízení / přijat +hodnocení / odmítnut +hodnocení). Příspěvky může přidávat, editovat a volitelně i mazat.
+Přihlášený recenzent vidí příspěvky, které mu byly přiděleny k recenzi, a může je hodnotit (alespoň 3 kritéria).
+Pokud příspěvek nebyl dosud schválen, tak své hodnocení může změnit.
+Administrátor spravuje uživatele (určuje jejich role a může uživatele zablokovat či smazat), přiřazuje neschválené příspěvky recenzentům k ohodnocení (každý příspěvek bude recenzován minimálně třemi recenzenty) a na základě recenzí rozhoduje o přijetí nebo odmítnutí příspěvku. Přijaté příspěvky jsou automaticky publikovány ve veřejné části webu.
+\par Databáze musí obsahovat alespoň 3 tabulky dostatečně naplněné daty pro předvedení funkčnosti aplikace.
+
+\section{Použité technologie}
+\par Pro vytvoření databázové vrstvy programu byl použit systém MySQL Ver 15.1 Distribuce 10.1.26 - MariaDB.
+\par Backend aplikační části je implementován pomocí jazyku PHP (podle zadání) a při vývoji aplikace byla použita verze 5.6.
+\par Frontend aplikace je realizován za pomocí CSS frameworku Bootstrap v. 4, knihovny jQuery, kterou používá samotný
+Bootstrap a zároveň byla použita pro některé dynamické části aplikace, a template engine knihovny Twig v. 2.4.5.
+
+\section{Popis arhitektury}
+\par Aplikace je strukturována ve smyslu návrhového vzoru MVC (Model View Controller) a je rozdělena do několika vrstev.
+
+\section{Databáze}
+\par Databáze aplikace je tvořena 4 tabulkami. Tabulka CONUSER obsahuje data o uživatelích konference, tabulka POST obsahuje příspěvky autorů,
+tabulka REVIEW obsahuje hodnocení jednotlivých příspěvků a tabulka ASSIGNMENT přiřazuje jednotlivé příspěvky různým recenzentům.
+
+\subsection{Model}
+\par Datový model aplikace je reprezentován třídami PHP, které mají atributy odpovídající jednotlivým sloupcům
+databázových tabulek a neposkytují žádnou další funkčnost, slouží pouze pro sdružování dat v aplikaci.
+
+\subsection{Přístup k modelu}
+\par Přístup k datům uložených v tabulkách mají na starosti třídy vrstvy, která zajišťujě připojení k databázi,
+obsahuje funkce, které umožňůjí výběr, vkládání, mazání i úpravu dat v tabulkách a jako výsledky výběru poskytuje třídy modelu.
+
+\subsection{Kontroléry}
+\par Kontroléry mají na starosti předávání dat získaných z databáze do pohledů a zpracování požadavků a událostí,
+které na jednotlivých pohledech uživatel provede, jako např. vytváření nových záznamů nebo úpravu již existujícíh
+záznamů v databázi.
+
+\subsection{Pohledy}
+\par Pohledy jednotlivých usecasů aplikace jsou realizovány HTML soubory obsahující navíc příkazy template enginu Twig,
+které umožňují v nich zobrazovat data poskytnutá kontroléry jako třídy modelu.
+
+\subsection{Struktura adresáře}
+\begin{itemize}
+    \item{content} - Soubory CSS stylů, JavaScript soubory a obrázky, které aplikace využívá
+    \item{controller} - PHP třídy kontrolerů
+    \item{dbconnector} - Třídy zajíšťující propojení s databází
+    \item{dbscripts} - SQL skripty pro založení databáze
+    \item{documentation} - Adresář s dokumentací
+    \item{inc} - PHP třídy s pomocnými funkcemi, konstantami a třídou, která zajišťující routování
+    \item{model} - PHP třídy datového modelu
+    \item{posts} - Nahrané PDF příspěvky
+    \item{twig} - Šablonový systém Twig
+    \item{vendor} - Soubory Bootstrapu, a další knihovny
+    \item{view} - Šablony pohledů aplikace
+\end{itemize}
+
+\section{Verzování aplikace}
+\par Pro verzování aplikace během vývoje byl použit repozitář systému Git na serveru GitHub. Repozitář je veřeně
+přístupný na adrese \url{https://github.com/hachaf/KIV_WEB_CONFERENCE}.
+
+\section{Závěr}
+\par Vytvořená aplikace obsahuje funční usecasy popsané v zadání implementované v programovacím jazyce PHP a je
+organizována podle návrhového vzoru MVC.
+
+
+\appendix
+\newpage
+
+\end{document}

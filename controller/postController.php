@@ -131,7 +131,11 @@ class postController extends baseController {
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
-        $authorization = $_SESSION["user"]->getType();
+        if ($_SESSION["user"] != null) {
+            $authorization = $_SESSION["user"]->getType();
+        } else {
+            $authorization = "NON";
+        }
         $menu = $menuCtrl->render($authorization);
 
         $conPostDB = new dbPost();
@@ -153,13 +157,22 @@ class postController extends baseController {
         require_once 'menuController.php';
         require_once 'twig/lib/Twig/Autoloader.php';
         $menuCtrl = new menuController();
-        $authorization = $_SESSION["user"]->getType();
+        if ($_SESSION["user"] != null) {
+            $authorization = $_SESSION["user"]->getType();
+        } else {
+            $authorization = "NON";
+        }
         $menu = $menuCtrl->render($authorization);
 
         $conPostDB = new dbPost();
         $conPostDB->Connect();
         $post = $conPostDB->getById($id);
         $conPostDB->Disconnect();
+
+        $conUserDB = new dbConUser();
+        $conUserDB->Connect();
+        $author = $conUserDB->getById($post->getID());
+        $conUserDB->Disconnect();
 
         Twig_Autoloader::register();
         $loader = new Twig_Loader_Filesystem('view');
@@ -168,6 +181,7 @@ class postController extends baseController {
         $template_params = array();
         $template_params["menu"] = $menu;
         $template_params["post"] = $post;
+        $template_params["author"] = $author;
         return $template->render($template_params);
     }
 

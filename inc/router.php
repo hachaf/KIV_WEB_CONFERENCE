@@ -28,6 +28,7 @@ class router {
     }
 
     public function route($p) {
+
         switch ($p) {
             case "login":
                 echo $this->login();
@@ -290,6 +291,7 @@ class router {
     }
 
     private function logout() {
+        unset($_SESSION["user"]);
         session_abort();
         return $this->homeCtrl->indexAction(null);
     }

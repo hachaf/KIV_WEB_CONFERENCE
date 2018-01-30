@@ -107,7 +107,7 @@ class dbConUser extends dbBase {
     }
 
     function getByNameAndPwd($username, $pwd) {
-        $stmt = $this->connection->prepare("SELECT * FROM CONUSER WHERE (LOGIN = :login AND PASSWORD = :password)");
+        $stmt = $this->connection->prepare("SELECT * FROM CONUSER WHERE (LOGIN = :login AND PASSWORD = :password AND BLOCKED != 1)");
         $stmt->bindParam(':login', $username);
         $stmt->bindParam(':password', $pwd);
         $stmt->execute();
