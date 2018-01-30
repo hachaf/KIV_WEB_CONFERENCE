@@ -98,7 +98,6 @@ class dbPost extends dbBase {
         $stmt_text = 'DELETE FROM POST WHERE ID = ' . $id . ';';
         $stmt = $this->connection->prepare($stmt_text);
         $stmt->bindValue(1, $id);
-        echo $stmt_text;
         $stmt->execute();
     }
 
