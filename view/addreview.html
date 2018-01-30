@@ -69,7 +69,7 @@
                         <label for="reviewtext">Review text:</label>
                         <textarea class="form-control" id="reviewtext" name="reviewtext" cols="50" rows="20"></textarea>
                     </div>
-                    <button type="submit" name="submit" class="btn btn-default">Add review</button>
+                    <button type="submit" name="submit" class="btn btn-default add-btn">Add review</button>
             </div>
         </div>
     </section>
@@ -85,6 +85,19 @@
 
 <!-- Custom scripts for this template -->
 <script src="content/js/resume.min.js"></script>
+
+<script>
+    $('document').ready(function(){
+        $(':input[type="submit"]').prop('disabled', true);
+        $('#reviewtext').change(function() {
+            if ($('#reviewtext').val().length > 1) {
+                $(':input[type="submit"]').prop('disabled', false);
+            } else {
+                $(':input[type="submit"]').prop('disabled', true);
+            }
+        });
+    });
+</script>
 
 </body>
 

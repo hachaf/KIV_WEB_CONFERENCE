@@ -206,7 +206,7 @@ class router {
             return $this->postCtrl->edit($_GET["id"], $msg);
         }
 
-        if (!isset($_FILES['pdffile']) || !array_key_exists("pdffile", $_FILES)) {
+        if ((!isset($_FILES['pdffile']) || !array_key_exists("pdffile", $_FILES)) && array_key_exists("abstract", $_POST)) {
             $msg = "Post PDF file required";
             return $this->postCtrl->edit($_GET["id"], $msg);
         }
@@ -220,10 +220,8 @@ class router {
             if (array_key_exists("pdffile", $_FILES)) {
                 if(isset($_FILES['pdffile'])){
                     $errors = array();
-                    $file_name = $_FILES['pdffile']['name'];
                     $file_size = $_FILES['pdffile']['size'];
                     $file_tmp  = $_FILES['pdffile']['tmp_name'];
-                    $file_type = $_FILES['pdffile']['type'];
                     $expl = explode('.',$_FILES['pdffile']['name']);
                     $end = end($expl);
                     $file_ext = strtolower($end);
