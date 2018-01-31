@@ -30,13 +30,25 @@ class dbReview extends dbBase {
         return $result;
     }
 
+    function getByPost($postId) {
+        $query = "SELECT * FROM REVIEW WHERE POST_ID = :postId;";
+        $statement = $this->connection->prepare($query);
+        $statement->bindParam(':postId', $postId);
+        $statement->execute();
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $reviews = array();
+        foreach ($rows as $row) {
+            array_push($reviews, new review($row));
+        }
+        return $reviews;
+    }
+
     /**
      * Najde v databázi recenzi podle id
      * @param $id id recenze
      * @return null|review
      */
     function getById($id) {
-        if (!is_int($id)) return null;
         $query = "SELECT * FROM REVIEW WHERE ID = :id;";
         $statement = $this->connection->prepare($query);
         $statement->bindParam(':id', $id);

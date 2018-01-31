@@ -122,6 +122,8 @@ class postController extends baseController {
                         move_uploaded_file($file_tmp,"posts/" . $post->getID() . ".pdf");
                         $id = $post->getID();
                         $post->setFilename($id . ".pdf");
+                        $dbPostConnect->update($post);
+                        $dbPostConnect->Disconnect();
                         return $this->view($id);
                     }else{
                         $msg = "PDF file required";
@@ -332,6 +334,40 @@ class postController extends baseController {
         $template_params["author"] = $author;
         $template_params["reviewers"] = $reviewers;
         return $template->render($template_params);
+    }
+
+    public function showReviews() {
+        if ($_SESSION["user"]->getType() != 'ADM') {
+            return $this->notAuthorized();
+        }
+        require_once 'menuController.php';
+        require_once 'twig/lib/Twig/Autoloader.php';
+        $menuCtrl = new menuController();
+        $authorization = $_SESSION["user"]->getType();
+        $menu = $menuCtrl->render($authorization);
+        $dbReview = new dbReview();
+        $dbReview->Connect();
+        $reviews = $dbReview->getByPost($_GET["id"]);
+        $dbReview->Disconnect();
+
+        $dbUser = new dbConUser();
+        $authors = array();
+        $dbUser->Connect();
+        foreach ($reviews as $r) {
+            $authors[$r->getID()] = $dbUser->getById($r->getAuthorID());
+        }
+        $dbUser->Disconnect();
+
+        Twig_Autoloader::register();
+        $loader = new Twig_Loader_Filesystem('view');
+        $twig = new Twig_Environment($loader);
+        $template = $twig->loadTemplate('showreviews.html');
+        $template_params = array();
+        $template_params["menu"] = $menu;
+        $template_params["reviews"] = $reviews;
+        $template_params["authors"] = $authors;
+        return $template->render($template_params);
+
     }
 
 }

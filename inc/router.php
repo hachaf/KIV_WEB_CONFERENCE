@@ -86,6 +86,10 @@ class router {
                 echo $this->editpost();
                 break;
 
+            case "showreviews":
+                echo $this->showReviews();
+                break;
+
             default:
                 echo $this->home();
                 break;
@@ -239,6 +243,10 @@ class router {
 
     private function viewpost() {
         return $this->postCtrl->view($_GET["id"]);
+    }
+
+    private function showReviews() {
+        return $this->postCtrl->showReviews();
     }
 
 }

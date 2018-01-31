@@ -54,7 +54,6 @@ class dbPost extends dbBase {
         $query = "INSERT INTO POST (AUTHOR_ID, ABSTRACT, FILENAME, PUBLICATED, STATE, TITLE) 
                   VALUES (:authorId, :abstract, :filename, :publicated, :state, :title);";
         $statement = $this->connection->prepare($query);
-
         $statement->bindParam(":authorId", $authorId);
         $statement->bindParam(":abstract", $abstract);
         $statement->bindParam(":publicated", $publicated);
